@@ -1,0 +1,108 @@
+<nav class="navbar">
+  <div class="nav-container">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-circle">M</div>
+      <span class="logo-text">Momentry</span>
+    </div>
+
+    <!-- Menu -->
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#templates">Templates</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#waitlist">Waitlist</a>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="nav-actions">
+      <button class="cta-btn">
+        Join Waitlist
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<section class="hero-section">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-tag">PERSONALIZED DIGITAL INVITATIONS</div>
+      <h1>Turn every invitation into a<br><span>Personal Moment</span></h1>
+      <p>Design luxurious animated invitation pages and share unique links with each guest. Every guest receives a beautifully tailored experience.</p>
+
+      <div class="hero-cta-group">
+        <button class="hero-primary-btn">Create Your Invite <span aria-hidden="true">-></span></button>
+        <button class="hero-secondary-btn"><span class="play-icon" aria-hidden="true"></span> View Demo</button>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-avatars" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="hero-pill"><strong>2,400+ couples & hosts</strong> joined the waitlist</div>
+      </div>
+    </div>
+
+    <div class="hero-card-wrap">
+      <div class="hero-card-base"></div>
+      <div
+        class="hero-card"
+        [class.is-open]="invitationOpen()"
+        role="button"
+        tabindex="0"
+        aria-label="Open invitation card"
+        (click)="toggleInvitation()"
+        (keydown.enter)="toggleInvitation()"
+        (keydown.space)="toggleInvitation()"
+      >
+        <div class="gate-panel gate-panel-left">
+          <span>Momentry</span>
+        </div>
+        <div class="gate-panel gate-panel-right">
+          <img src="/assets/border-design.png" alt="" aria-hidden="true">
+          <span>Open</span>
+        </div>
+
+        <div class="hero-card-content">
+          <div class="hero-card-heading">Save the Date</div>
+          <h2>Dear <span class="typed-name">{{ typedGuestName() }}</span></h2>
+          <p class="hero-card-text">You're invited to the wedding of</p>
+          <h3>Anaya &amp; Vihaan</h3>
+          <div class="hero-card-divider"></div>
+
+          <div class="hero-card-grid">
+            <div class="hero-info-block">
+              <span>
+                <svg class="info-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3 3.5h10v9H3zM3 6h10M5 2v3M11 2v3" />
+                </svg>
+                When
+              </span>
+              <strong>14 February 2026<br>7:00 PM</strong>
+            </div>
+            <div class="hero-info-block">
+              <span>
+                <svg class="info-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 13s4-3.4 4-7a4 4 0 0 0-8 0c0 3.6 4 7 4 7z" />
+                  <path d="M8 7.5a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8z" />
+                </svg>
+                Where
+              </span>
+              <strong>Taj Falaknuma<br>Hyderabad</strong>
+            </div>
+          </div>
+
+          <div class="hero-card-note">
+            <span>Reception to follow</span>
+            Dinner, music & blessings with family
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

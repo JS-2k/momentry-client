@@ -1,3 +1,58 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
+
+.gate-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(150deg, #fff8e9, #f2dfba);
+  border: 1px solid rgba(201, 151, 45, 0.28);
+  transition: transform 0.9s cubic-bezier(.2,.8,.2,1), box-shadow 0.9s ease;
+  z-index: 4;
+  backface-visibility: hidden;
+}
+
+.gate-panel span {
+  position: relative;
+  z-index: 1;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #a97816;
+  font-size: 1.15rem;
+  font-style: italic;
+  letter-spacing: 0.08em;
+}
+
+.gate-panel-left {
+  left: 0;
+  border-radius: 22px 0 0 22px;
+  transform-origin: left center;
+}
+
+.gate-panel-right {
+  right: 0;
+  border-radius: 0 22px 22px 0;
+  transform-origin: right center;
+}
+
+.gate-panel-right img {
+  position: absolute;
+  right: -52px;
+  bottom: -42px;
+  width: 190px;
+  opacity: 0.38;
+}
+
+.hero-card.is-open .gate-panel-left {
+  transform: rotateY(-112deg);
+  box-shadow: -20px 24px 40px rgba(72, 54, 31, 0.12);
+}
+
+.hero-card.is-open .gate-panel-right {
+  transform: rotateY(112deg);
+  box-shadow: 20px 24px 40px rgba(72, 54, 31, 0.12);
+}
