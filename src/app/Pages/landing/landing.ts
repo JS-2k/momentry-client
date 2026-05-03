@@ -17,6 +17,7 @@ export class Landing implements OnInit, OnDestroy {
   private isDeletingName = false;
   typedGuestName = signal('');
   invitationOpen = signal(false);
+  mobileMenuOpen = signal(false);
   readonly templateCategories = [
     {
       category: 'Wedding',
@@ -156,6 +157,14 @@ export class Landing implements OnInit, OnDestroy {
       this.invitationOpen.set(true);
       this.playConfettiBurst();
     }
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update((isOpen) => !isOpen);
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen.set(false);
   }
 
   private playConfettiBurst() {

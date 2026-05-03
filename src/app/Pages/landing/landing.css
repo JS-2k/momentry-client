@@ -104,6 +104,47 @@ p, a, button, li {
   transition: 0.3s;
 }
 
+.mobile-menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 1px solid rgba(80, 62, 34, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.76);
+  color: #191816;
+  cursor: pointer;
+}
+
+.mobile-menu-toggle span {
+  display: block;
+  width: 17px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition:
+    transform 0.22s ease,
+    opacity 0.22s ease;
+}
+
+.mobile-menu-toggle.is-open span:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.mobile-menu-toggle.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.is-open span:last-child {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.mobile-menu {
+  display: none;
+}
+
 .hero-section {
   min-height: 100vh;
   padding: 138px 20px 66px;
@@ -547,13 +588,79 @@ p, a, button, li {
     padding: 124px 16px 58px;
   }
 
+  .navbar {
+    top: 12px;
+  }
+
+  .navbar:has(.mobile-menu.is-open) .nav-container {
+    border-radius: 16px 16px 0 0;
+  }
+
   .nav-container {
     width: 95%;
     padding: 12px 18px;
   }
 
-  .nav-links {
+  .nav-links,
+  .nav-actions {
     display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: grid;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    top: 66px;
+    left: 50%;
+    width: 95%;
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid rgba(183, 139, 51, 0.14);
+    border-top: 0;
+    border-radius: 0 0 16px 16px;
+    background: rgba(255, 252, 246, 0.96);
+    box-shadow: 0 22px 44px rgba(71, 54, 31, 0.12);
+    backdrop-filter: blur(18px);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -10px);
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease;
+  }
+
+  .mobile-menu.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+
+  .mobile-menu a,
+  .mobile-menu button {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #39342e;
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .mobile-menu button {
+    justify-content: center;
+    margin-top: 4px;
+    background: #191816;
+    color: #fff8ed;
+    cursor: pointer;
   }
 
   .hero-copy h1 {

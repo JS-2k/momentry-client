@@ -22,6 +22,33 @@
       </button>
     </div>
 
+    <button
+      type="button"
+      class="mobile-menu-toggle"
+      [class.is-open]="mobileMenuOpen()"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      aria-controls="mobile-menu"
+      aria-label="Toggle navigation menu"
+      (click)="toggleMobileMenu()"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+
+  <div
+    id="mobile-menu"
+    class="mobile-menu"
+    [class.is-open]="mobileMenuOpen()"
+    aria-label="Mobile navigation"
+  >
+    <a href="#features" (click)="closeMobileMenu()">Features</a>
+    <a href="/templates" (click)="closeMobileMenu()">Templates</a>
+    <a href="#pricing" (click)="closeMobileMenu()">Pricing</a>
+    <a href="#waitlist" (click)="closeMobileMenu()">Waitlist</a>
+    <button type="button" (click)="closeMobileMenu()">Join Waitlist</button>
   </div>
 </nav>
 
