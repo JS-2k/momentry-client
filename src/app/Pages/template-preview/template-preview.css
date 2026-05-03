@@ -101,7 +101,7 @@
 }
 
 .preview-stage {
-  min-height: 320vh;
+  min-height: 100vh;
   padding: 0;
 }
 
@@ -149,7 +149,7 @@
   }
 
   .preview-stage {
-    min-height: 340vh;
+    min-height: 100vh;
     padding: 0;
   }
 }

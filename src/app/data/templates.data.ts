@@ -26,6 +26,18 @@ export const INVITATION_TEMPLATES: InvitationTemplate[] = [
     route: '/templates/weddings/moonlit-jasmine',
     palette: ['#f7efe2', '#d5b982', '#17473a', '#11100e'],
   },
+  {
+    slug: 'kanchi-thoranam',
+    categorySlug: 'weddings',
+    title: 'Kanchi Thoranam',
+    category: 'Wedding',
+    tags: ['Traditional', 'South Indian', 'Temple', 'Luxury'],
+    designer: 'Momentry Studio',
+    photoCount: 1,
+    price: 'Premium',
+    route: '/templates/weddings/kanchi-thoranam',
+    palette: ['#fff7e5', '#8b2b18', '#efb64a', '#1f6f45'],
+  },
 ];
 
 export function findInvitationTemplate(categorySlug: string | null, slug: string | null) {

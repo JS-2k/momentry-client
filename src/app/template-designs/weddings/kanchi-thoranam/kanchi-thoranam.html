@@ -1,0 +1,124 @@
+<article class="kanchi-page" aria-label="காஞ்சி தோரணம் திருமண அழைப்பிதழ்">
+  <audio #musicPlayer src="/assets/music/kanchi.mp3" loop preload="metadata"></audio>
+
+  <section class="opening-stage">
+    <div class="stage-video" aria-hidden="true">
+      <video autoplay muted loop playsinline poster="/assets/videos/krishna.jpg">
+        <source src="/assets/videos/krishna.mp4" type="video/mp4" />
+      </video>
+      <img src="/assets/videos/krishna.jpg" alt="" />
+    </div>
+
+    <button
+      type="button"
+      class="music-pill"
+      [class.is-playing]="isMusicPlaying"
+      (click)="toggleMusic()"
+    >
+      <span></span>
+      {{ isMusicPlaying ? 'இசை நிறுத்து' : 'இசை இயக்கு' }}
+    </button>
+
+    <div
+      class="invitation-book"
+      [class.is-open]="isInvitationOpen"
+      aria-label="திருமண அழைப்பிதழ் திறப்பு"
+    >
+      <div class="book-shadow" aria-hidden="true"></div>
+
+      <div class="inside-page">
+        <div class="paper-border">
+          <p class="eyebrow">திருமண அழைப்பிதழ்</p>
+          <h1>{{ invitation.couple }}</h1>
+          <p class="blessing">{{ invitation.blessing }}</p>
+
+          <div class="divider" aria-hidden="true">
+            <i></i>
+            <span></span>
+            <i></i>
+          </div>
+
+          <p class="message">{{ invitation.message }}</p>
+
+          <dl class="main-details">
+            <div>
+              <dt>நாள்</dt>
+              <dd>{{ invitation.date }}</dd>
+            </div>
+            <div>
+              <dt>முகூர்த்தம்</dt>
+              <dd>{{ invitation.muhurtham }}</dd>
+            </div>
+            <div>
+              <dt>இடம்</dt>
+              <dd>{{ invitation.venue }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="card-cover"
+        [attr.aria-label]="isInvitationOpen ? 'அழைப்பிதழ் திறக்கப்பட்டுள்ளது' : 'அழைப்பிதழை திறக்கவும்'"
+        (click)="openInvitation()"
+      >
+        <div class="cover-pattern"></div>
+        <div class="cover-center">
+          <span>ஸ்ரீ</span>
+          <strong>காஞ்சி தோரணம்</strong>
+          <small>{{ isInvitationOpen ? 'Invitation opened' : 'Tap to open' }}</small>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <section class="ceremony-strip" aria-label="திருமண நிகழ்ச்சி நிரல்">
+    <article>
+      <small>01</small>
+      <h2>நாதஸ்வர வரவேற்பு</h2>
+      <p>மங்கள இசையுடன் உறவுகளும் நண்பர்களும் வரவேற்கப்படுவர்.</p>
+    </article>
+    <article>
+      <small>02</small>
+      <h2>ஊஞ்சல் சடங்கு</h2>
+      <p>பாடல்கள், சிரிப்புகள், பெரியோரின் ஆசீர்வாதங்களுடன் இனிய நிகழ்ச்சி.</p>
+    </article>
+    <article>
+      <small>03</small>
+      <h2>முகூர்த்தம்</h2>
+      <p>புனித மாங்கல்யம் கட்டப்படும் மனதில் நிற்கும் தருணம்.</p>
+    </article>
+  </section>
+
+  <section class="photo-story">
+    <div class="story-photo">
+      <img src="/assets/indian-wedding.jpg" alt="South Indian wedding couple" />
+    </div>
+    <div class="story-copy">
+      <span>விருந்து</span>
+      <h2>வாழை இலையில் அன்புடன்.</h2>
+      <p>
+        சாம்பார், ரசம், பொரியல், அப்பளம், பாயசம், ஃபில்டர் காபி என
+        பாரம்பரிய தென்னிந்திய விருந்து. மாலை வரவேற்பில் இசை, புகைப்படங்கள்,
+        குடும்ப நினைவுகள் தொடரும்.
+      </p>
+    </div>
+  </section>
+
+  <section class="location-panel">
+    <div>
+      <span>திருமண இடம்</span>
+      <h2>{{ invitation.location }}</h2>
+      <p>{{ invitation.reception }}</p>
+    </div>
+
+    <div class="temple-map" aria-label="திருமண இடம் முன்னோட்டம்">
+      <div class="map-roads" aria-hidden="true"></div>
+      <div class="map-label">
+        <strong>{{ invitation.venue }}</strong>
+        <small>கோவில் தெரு நுழைவாயில்</small>
+      </div>
+    </div>
+  </section>
+</article>
