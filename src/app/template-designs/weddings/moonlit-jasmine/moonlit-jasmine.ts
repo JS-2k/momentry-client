@@ -51,6 +51,7 @@ export class MoonlitJasmine implements AfterViewInit, OnDestroy {
   private isCompactViewport = false;
   private scrollProgress = 0;
   private clock?: Three.Clock;
+  private readonly introFlightDuration = 4.2;
 
   ngAfterViewInit() {
     void this.createButterflyScene();
@@ -251,19 +252,26 @@ export class MoonlitJasmine implements AfterViewInit, OnDestroy {
 
     if (this.butterflyModel) {
       const mobile = this.isCompactViewport;
+      const introProgress = this.clamp(elapsed / this.introFlightDuration, 0, 1);
+      const introArc = Math.sin(introProgress * Math.PI);
+      const introTurn = Math.sin(introProgress * Math.PI * 2);
       const flutter = Math.sin(elapsed * 4.4) * (mobile ? 0.07 : 0.11);
       const driftX = Math.sin(elapsed * 0.72) * (mobile ? 0.18 : 0.32);
       const driftY = Math.sin(elapsed * 1.08) * (mobile ? 0.16 : 0.26);
       const depth = Math.cos(elapsed * 0.58) * (mobile ? 0.08 : 0.18);
-
-      this.butterflyModel.position.x = mobile ? 1.1 + driftX : 2.45 + driftX;
-      this.butterflyModel.position.y =
+      const baseX = mobile ? 1.1 + driftX : 2.45 + driftX;
+      const baseY =
         (mobile ? -0.36 : 0.14) + driftY + flutter + Math.sin(progress * Math.PI) * 0.12;
-      this.butterflyModel.position.z = mobile ? -0.2 + depth : 0.04 + depth;
+      const baseZ = mobile ? -0.2 + depth : 0.04 + depth;
+      const baseScale = mobile ? 0.0044 : 0.013;
+
+      this.butterflyModel.position.x = baseX - introArc * (mobile ? 1.25 : 2.25);
+      this.butterflyModel.position.y = baseY + introArc * (mobile ? 0.34 : 0.58);
+      this.butterflyModel.position.z = baseZ + introArc * (mobile ? 1.2 : 2.55);
       this.butterflyModel.rotation.x = 0.18 + Math.sin(elapsed * 1.8) * 0.12;
-      this.butterflyModel.rotation.y = -1.28 + Math.sin(elapsed * 1.2) * 0.2;
-      this.butterflyModel.rotation.z = -0.14 + Math.sin(elapsed * 2.8) * 0.2;
-      this.butterflyModel.scale.setScalar(mobile ? 0.0044 : 0.013);
+      this.butterflyModel.rotation.y = -1.28 + Math.sin(elapsed * 1.2) * 0.2 + introTurn * 0.72;
+      this.butterflyModel.rotation.z = -0.14 + Math.sin(elapsed * 2.8) * 0.2 + introArc * 0.28;
+      this.butterflyModel.scale.setScalar(baseScale * (1 + introArc * (mobile ? 1.9 : 2.15)));
     }
 
     this.camera.position.x = this.isCompactViewport ? 0.08 : 0.25;
