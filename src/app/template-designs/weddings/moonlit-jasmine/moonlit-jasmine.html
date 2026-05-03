@@ -1,0 +1,194 @@
+<article class="jasmine-experience" aria-label="Moonlit Jasmine wedding invitation">
+  <audio #musicPlayer src="/assets/music/jasmine-wedding.mp3" loop preload="metadata"></audio>
+
+  <div class="jasmine-hero-scroll">
+    <section class="jasmine-scene">
+    <canvas #butterflyCanvas class="butterfly-canvas" aria-hidden="true"></canvas>
+
+      <div class="live-comments" aria-label="Live guest reactions">
+        <div class="comment-launcher" aria-hidden="true">
+          <span></span>
+        </div>
+
+        @for (comment of activeComments; track comment.id) {
+          <div class="live-comment">
+            {{ comment.text }}
+          </div>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="music-toggle"
+        [class.is-playing]="isMusicPlaying"
+        (click)="toggleMusic()"
+      >
+        <span aria-hidden="true"></span>
+        {{ isMusicPlaying ? 'Pause music' : 'Play music' }}
+      </button>
+
+      <div class="scene-wash" aria-hidden="true"></div>
+
+      <div class="scene-layer scene-date">
+        <span>June</span>
+        <strong>12</strong>
+        <span>2026</span>
+      </div>
+
+      <div class="scene-layer scene-photo">
+        <div class="photo-frame">
+          <img src="/assets/wedding.jpg" alt="Wedding couple" />
+        </div>
+        <div class="photo-caption">Rosewood Estate, Florence</div>
+      </div>
+
+      <div class="scene-layer scene-names">
+        <p>Wedding celebration</p>
+        <h1>{{ invitation.couple }}</h1>
+      </div>
+
+      <div class="scene-layer scene-message">
+        <p class="guest-line">{{ invitation.guest }}</p>
+        <h2>{{ invitation.headline }}</h2>
+        <p>{{ invitation.message }}</p>
+      </div>
+
+      <div class="scene-layer scene-details">
+        <div>
+          <span>Time</span>
+          <strong>{{ invitation.time }}</strong>
+        </div>
+        <div>
+          <span>Venue</span>
+          <strong>{{ invitation.venue }}</strong>
+        </div>
+        <div>
+          <span>Location</span>
+          <strong>{{ invitation.location }}</strong>
+        </div>
+      </div>
+
+      <div class="scene-layer scene-finale">
+        <span>Reception to follow</span>
+        <p>{{ invitation.reception }}</p>
+        <button type="button">RSVP Now</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="story-section love-story" aria-labelledby="love-story-title">
+    <div class="story-copy">
+      <p class="section-kicker">How it started</p>
+      <h2 id="love-story-title">A quiet hello that became every favorite plan.</h2>
+      <p>
+        Ava and Leo met during a rainy evening at a garden cafe, both reaching for the
+        last jasmine tea on the counter. One shared table turned into sunset walks,
+        handwritten notes, and a promise to choose each other in every season.
+      </p>
+    </div>
+
+    <div class="story-photo-stack" aria-label="Love story photos">
+      <figure class="story-photo story-photo-large">
+        <img src="/assets/wedding.jpg" alt="Ava and Leo smiling together" />
+        <figcaption>First garden walk</figcaption>
+      </figure>
+      <figure class="story-photo story-photo-small">
+        <img src="/assets/wedding.jpg" alt="Ava and Leo wedding memory" />
+        <figcaption>The yes moment</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="memories-section" aria-labelledby="memories-title">
+    <div class="section-heading">
+      <p class="section-kicker">Little memories</p>
+      <h2 id="memories-title">The details they still talk about.</h2>
+    </div>
+
+    <div class="memory-grid">
+      <article>
+        <span>01</span>
+        <h3>Jasmine Notes</h3>
+        <p>Every anniversary begins with a handwritten letter and a single white jasmine.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h3>Sunday Records</h3>
+        <p>Their living room playlist became the sound of slow mornings and big dreams.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Golden Hour</h3>
+        <p>Leo proposed just as the courtyard lights turned on for the evening.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="agenda-section" aria-labelledby="agenda-title">
+    <div class="section-heading">
+      <p class="section-kicker">Wedding agenda</p>
+      <h2 id="agenda-title">What the evening holds.</h2>
+    </div>
+
+    <div class="agenda-timeline">
+      <div>
+        <time>6:30 PM</time>
+        <strong>Garden Welcome</strong>
+        <span>Signature jasmine mocktails and live strings.</span>
+      </div>
+      <div>
+        <time>7:00 PM</time>
+        <strong>Ceremony</strong>
+        <span>Vows beneath the candlelit arch.</span>
+      </div>
+      <div>
+        <time>8:15 PM</time>
+        <strong>Dinner</strong>
+        <span>Family-style courses, dessert bar, and table-side stories.</span>
+      </div>
+      <div>
+        <time>9:30 PM</time>
+        <strong>Music Party</strong>
+        <span>DJ set, first dance, and open floor under the garden lights.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="celebration-section" aria-labelledby="celebration-title">
+    <div>
+      <p class="section-kicker">For every guest</p>
+      <h2 id="celebration-title">A night made for memories.</h2>
+    </div>
+
+    <div class="celebration-list">
+      <span>Live acoustic welcome</span>
+      <span>Curated dinner menu</span>
+      <span>Photo memory wall</span>
+      <span>Garden dance party</span>
+      <span>Late-night dessert table</span>
+    </div>
+  </section>
+
+  <section class="location-section" aria-labelledby="location-title">
+    <div class="location-copy">
+      <p class="section-kicker">Wedding location</p>
+      <h2 id="location-title">{{ invitation.location }}</h2>
+      <p>
+        Ceremony and reception are hosted inside Jasmine Courtyard at Rosewood Estate.
+        Follow the lantern path from the main gate to the garden entrance.
+      </p>
+      <button type="button">Open map</button>
+    </div>
+
+    <div class="map-view" aria-label="Map preview of Rosewood Estate">
+      <div class="map-grid" aria-hidden="true"></div>
+      <div class="map-road map-road-main" aria-hidden="true"></div>
+      <div class="map-road map-road-side" aria-hidden="true"></div>
+      <div class="map-pin">
+        <span></span>
+        <strong>Jasmine Courtyard</strong>
+        <small>Rosewood Estate</small>
+      </div>
+    </div>
+  </section>
+</article>

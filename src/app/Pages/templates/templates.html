@@ -1,0 +1,84 @@
+<main class="templates-page">
+  <section class="templates-hero" aria-labelledby="templates-title">
+    <div>
+      <a class="back-link" href="/">Momentry</a>
+      <p class="templates-kicker">Template collection</p>
+      <h1 id="templates-title">Wedding invitation templates</h1>
+    </div>
+
+    <p>
+      Browse one polished wedding design with practical filters ready for the full template
+      library.
+    </p>
+  </section>
+
+  <section class="templates-toolbar" aria-label="Template filters">
+    <label class="search-field">
+      <span>Search templates</span>
+      <input
+        type="search"
+        name="templateSearch"
+        [(ngModel)]="searchTerm"
+        placeholder="Search wedding, floral, elegant..."
+      />
+    </label>
+
+    <div class="category-filters" aria-label="Categories">
+      @for (category of categories; track category) {
+        <button
+          type="button"
+          [class.is-active]="selectedCategory === category"
+          (click)="selectCategory(category)"
+        >
+          {{ category }}
+        </button>
+      }
+    </div>
+
+    <div class="result-count">{{ filteredTemplates.length }} Result</div>
+  </section>
+
+  <section class="template-gallery" aria-label="Wedding templates">
+    @for (template of filteredTemplates; track template.title) {
+      <article class="wedding-template-card">
+        <div class="card-art" aria-hidden="true">
+          <div class="envelope-back"></div>
+          <div class="invitation-sheet">
+            <img src="/assets/wedding.jpg" alt="" />
+            <div class="sheet-copy">
+              <span>Wedding</span>
+              <strong>Ava &amp; Leo</strong>
+              <small>12 June 2026</small>
+            </div>
+          </div>
+          <div class="wax-seal">M</div>
+        </div>
+
+        <div class="card-details">
+          <div>
+            <p>{{ template.category }}</p>
+            <h2>{{ template.title }}</h2>
+            <span>{{ template.designer }}</span>
+          </div>
+
+          <a [routerLink]="template.route">Preview design</a>
+        </div>
+
+        <div class="card-meta" aria-label="Template details">
+          <span>{{ template.photoCount }} photo</span>
+          <span>{{ template.price }}</span>
+          <div class="template-swatches" aria-label="Template colors">
+            @for (color of template.palette; track color) {
+              <i [style.--swatch]="color"></i>
+            }
+          </div>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state">
+        <h2>No template found</h2>
+        <p>Try a different search term or category.</p>
+      </div>
+    }
+  </section>
+</main>

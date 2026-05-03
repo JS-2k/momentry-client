@@ -1,0 +1,31 @@
+<main class="preview-page">
+  @if (template(); as selectedTemplate) {
+    <nav class="preview-navbar" aria-label="Invitation actions">
+      <a class="back-link" routerLink="/templates">Templates</a>
+
+      <div class="navbar-title">
+        <span>{{ selectedTemplate.category }}</span>
+        <strong>{{ selectedTemplate.title }}</strong>
+      </div>
+
+      <div class="navbar-actions">
+        <button type="button">Share</button>
+        <button type="button">Add Details</button>
+      </div>
+    </nav>
+
+    <section class="preview-stage" aria-label="Invitation preview">
+      @switch (selectedTemplate.slug) {
+        @case ('moonlit-jasmine') {
+          <app-moonlit-jasmine />
+        }
+      }
+    </section>
+  } @else {
+    <section class="missing-template">
+      <h1>Template not found</h1>
+      <p>The invitation design you requested is not available.</p>
+      <a routerLink="/templates">Browse templates</a>
+    </section>
+  }
+</main>
