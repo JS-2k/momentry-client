@@ -1,7 +1,10 @@
 <main class="preview-page">
   @if (template(); as selectedTemplate) {
     <nav class="preview-navbar" aria-label="Invitation actions">
-      <a class="back-link" routerLink="/templates">Templates</a>
+      <a class="back-link" routerLink="/templates" aria-label="Back to templates">
+        <span aria-hidden="true">←</span>
+        Back to templates
+      </a>
 
       <div class="navbar-title">
         <span>{{ selectedTemplate.category }}</span>
