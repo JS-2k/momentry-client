@@ -250,31 +250,25 @@ export class MoonlitJasmine implements AfterViewInit, OnDestroy {
     this.mixer?.update(delta * 1.65);
 
     if (this.butterflyModel) {
-      const curve = Math.sin(progress * Math.PI);
       const mobile = this.isCompactViewport;
-      this.butterflyModel.position.x = mobile
-        ? this.lerp(1.45, -1.35, progress)
-        : this.lerp(2.8, -2.35, progress);
+      const flutter = Math.sin(elapsed * 4.4) * (mobile ? 0.07 : 0.11);
+      const driftX = Math.sin(elapsed * 0.72) * (mobile ? 0.18 : 0.32);
+      const driftY = Math.sin(elapsed * 1.08) * (mobile ? 0.16 : 0.26);
+      const depth = Math.cos(elapsed * 0.58) * (mobile ? 0.08 : 0.18);
+
+      this.butterflyModel.position.x = mobile ? 1.1 + driftX : 2.45 + driftX;
       this.butterflyModel.position.y =
-        (mobile ? this.lerp(-0.72, 0.92, progress) : this.lerp(-0.35, 1.35, progress)) +
-        Math.sin(elapsed * 4.4) * 0.1 +
-        curve * (mobile ? 0.3 : 0.46);
-      this.butterflyModel.position.z = mobile
-        ? this.lerp(0.05, -0.62, progress)
-        : this.lerp(0.45, -0.88, progress);
-      this.butterflyModel.rotation.x = 0.18 + Math.sin(elapsed * 1.8) * 0.1;
-      this.butterflyModel.rotation.y = -1.12 + progress * 3.6 + Math.sin(elapsed * 1.2) * 0.16;
-      this.butterflyModel.rotation.z = -0.18 + Math.sin(elapsed * 2.8) * 0.18;
-      this.butterflyModel.scale.setScalar(
-        mobile ? 0.0038 + curve * 0.0024 : 0.011 + curve * 0.007,
-      );
+        (mobile ? -0.36 : 0.14) + driftY + flutter + Math.sin(progress * Math.PI) * 0.12;
+      this.butterflyModel.position.z = mobile ? -0.2 + depth : 0.04 + depth;
+      this.butterflyModel.rotation.x = 0.18 + Math.sin(elapsed * 1.8) * 0.12;
+      this.butterflyModel.rotation.y = -1.28 + Math.sin(elapsed * 1.2) * 0.2;
+      this.butterflyModel.rotation.z = -0.14 + Math.sin(elapsed * 2.8) * 0.2;
+      this.butterflyModel.scale.setScalar(mobile ? 0.0044 : 0.013);
     }
 
-    this.camera.position.x = this.isCompactViewport
-      ? this.lerp(0.08, -0.08, progress)
-      : this.lerp(0.25, -0.25, progress);
-    this.camera.position.y = this.isCompactViewport ? 0.04 + progress * 0.38 : 0.08 + progress * 0.62;
-    this.camera.position.z = this.isCompactViewport ? 8.8 - progress * 0.6 : 7.8 - progress * 1.15;
+    this.camera.position.x = this.isCompactViewport ? 0.08 : 0.25;
+    this.camera.position.y = this.isCompactViewport ? 0.04 : 0.08;
+    this.camera.position.z = this.isCompactViewport ? 8.8 : 7.8;
     this.camera.lookAt(0, 0.35, 0);
     this.renderer.render(this.scene, this.camera);
   };

@@ -6,11 +6,12 @@
 }
 
 .jasmine-experience {
+  position: relative;
   background: linear-gradient(180deg, #fbf7ef 0%, #f4e5d0 100%);
 }
 
 .jasmine-hero-scroll {
-  min-height: 320vh;
+  min-height: 145vh;
 }
 
 .jasmine-scene {
@@ -750,7 +751,7 @@
 
 @media (max-width: 920px) {
   .jasmine-hero-scroll {
-    min-height: 340vh;
+    min-height: 135vh;
   }
 
   .jasmine-scene {
