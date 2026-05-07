@@ -38,6 +38,18 @@ export const INVITATION_TEMPLATES: InvitationTemplate[] = [
     route: '/templates/weddings/kanchi-thoranam',
     palette: ['#fff7e5', '#8b2b18', '#efb64a', '#1f6f45'],
   },
+  {
+    slug: 'surya-gopuram',
+    categorySlug: 'weddings',
+    title: 'Surya Gopuram',
+    category: 'Wedding',
+    tags: ['Traditional', 'South Indian', 'Temple', '3D'],
+    designer: 'Momentry Studio',
+    photoCount: 1,
+    price: 'Premium',
+    route: '/templates/weddings/surya-gopuram',
+    palette: ['#fff4dd', '#d85e24', '#ffd36f', '#7f1d12'],
+  },
 ];
 
 export function findInvitationTemplate(categorySlug: string | null, slug: string | null) {

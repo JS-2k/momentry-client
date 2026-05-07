@@ -1,0 +1,950 @@
+:host {
+  display: block;
+  background: #fff4dd;
+  color: #23130d;
+  --surya-progress: 0;
+  --p: var(--surya-progress);
+  --intro-reveal: 1;
+  --name-reveal: 0;
+  --name-x: -42px;
+  --name-y: 28px;
+  --blessing-reveal: 0;
+  --blessing-x: 36px;
+  --blessing-y: -18px;
+  --details-reveal: 0;
+  --details-y: 44px;
+}
+
+/* ─── Page shell ─────────────────────────────────────────────── */
+.surya-page {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(143, 50, 24, 0.06) 0 1px, transparent 1px 88px),
+    linear-gradient(180deg, #fff5dd 0%, #f8dfb7 48%, #fff8ea 100%);
+}
+
+/* ─── Sticky scroll stage ────────────────────────────────────── */
+.gopuram-scroll {
+  min-height: 255vh;
+}
+
+.gopuram-hero {
+  position: sticky;
+  top: 0;                    /* FIX: was 72px — let the host handle offset */
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(30px, 5vw, 70px) 20px;
+}
+
+/* Decorative column borders */
+.gopuram-hero::before,
+.gopuram-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: min(128px, 9vw);
+  opacity: calc(0.42 + var(--p) * 0.24);
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 18px, #ffd46f 0 5px, transparent 6px),
+    linear-gradient(180deg, rgba(127, 29, 18, 0.72), rgba(127, 29, 18, 0.04));
+  mask-image: repeating-linear-gradient(180deg, #000 0 22px, transparent 23px 34px);
+}
+
+.gopuram-hero::before { left: 0; }
+.gopuram-hero::after  { right: 0; }
+
+/* ─── Sky & atmosphere ───────────────────────────────────────── */
+.sunrise-sky {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(
+      180deg,
+      #361512 0%,
+      #702819 calc(20% + var(--p) * 8%),
+      #d85e24 calc(42% + var(--p) * 5%),
+      #ffd98c 66%,
+      #fff3dc 100%
+    );
+}
+
+.sun-core {
+  position: absolute;
+  left: 50%;
+  top: clamp(70px, 14vh, 136px);
+  width: clamp(190px, 30vw, 420px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff8c8 0 30%, #ffb642 58%, rgba(255, 139, 31, 0) 72%);
+  filter: blur(0.5px);
+  opacity: calc(0.72 + var(--p) * 0.28);
+  transform:
+    translate(-50%, calc(112px - var(--p) * 156px))
+    scale(calc(0.78 + var(--p) * 0.26));
+}
+
+.sun-halo {
+  position: absolute;
+  left: 50%;
+  top: clamp(24px, 8vh, 84px);
+  width: clamp(330px, 58vw, 820px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 225, 125, 0.42), rgba(255, 160, 59, 0.16) 42%, transparent 68%);
+  opacity: calc(0.42 + var(--p) * 0.34);
+  transform:
+    translate(-50%, calc(96px - var(--p) * 126px))
+    scale(calc(0.82 + var(--p) * 0.32));
+}
+
+.temple-rays {
+  position: absolute;
+  left: 50%;
+  top: 3%;
+  width: min(1040px, 120vw);
+  height: min(820px, 92vh);
+  background: conic-gradient(
+    from 210deg,
+    transparent 0 7%,
+    rgba(255, 245, 184, 0.22) 8% 9.2%,
+    transparent 10.4% 17%,
+    rgba(255, 237, 171, 0.2) 18% 19.2%,
+    transparent 20.5% 29%,
+    rgba(255, 244, 199, 0.18) 30% 31.2%,
+    transparent 32.8% 100%
+  );
+  opacity: calc(0.24 + var(--p) * 0.54);
+  transform: translateX(-50%) rotate(calc(var(--p) * 32deg));
+  transform-origin: 50% 18%;
+}
+
+.cloud-band {
+  position: absolute;
+  left: 50%;
+  width: 120vw;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(255, 242, 215, 0.42);
+  filter: blur(26px);
+  transform: translateX(-50%);
+}
+
+.cloud-band-one {
+  top: calc(42% - var(--p) * 8%);
+  animation: cloud-drift 8s ease-in-out infinite alternate;
+}
+
+.cloud-band-two {
+  top: calc(55% - var(--p) * 7%);
+  width: 96vw;
+  opacity: 0.44;
+  animation: cloud-drift 10s ease-in-out -3s infinite alternate-reverse;
+}
+
+/* ─── Badge (top center) ─────────────────────────────────────── */
+.temple-badge {
+  position: absolute;
+  left: 50%;
+  top: clamp(18px, 4vh, 42px);
+  z-index: 10;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: #fff8e7;
+  text-align: center;
+  text-shadow: 0 4px 20px rgba(76, 20, 8, 0.28);
+  opacity: var(--intro-reveal);
+  transform: translate(-50%, calc(var(--p) * -36px));
+  transition: opacity 0.1s linear;  /* FIX: smooth opacity step */
+}
+
+.temple-badge span,
+.blessing-panel span {
+  color: #ffe39a;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.temple-badge strong {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.8rem, 3.4vw, 3.4rem);
+  font-weight: 400;
+}
+
+.opening-title {
+  position: absolute;
+  left: clamp(28px, 6vw, 96px);
+  top: 50%;
+  z-index: 14;
+  width: min(440px, 36vw);
+  color: #7f1d12;
+  transform: translateY(-50%);
+  opacity: var(--intro-reveal);
+  text-shadow: 0 20px 52px rgba(96, 42, 16, 0.12);
+}
+
+.opening-title span {
+  display: block;
+  color: #a76424;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.opening-title h2 {
+  margin: 18px 0 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(4rem, 8.4vw, 8.4rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.84;
+}
+
+.opening-title small {
+  display: block;
+  margin: 0.08em 0;
+  color: #23130d;
+  font-size: 0.24em;
+  font-style: italic;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.opening-title p {
+  margin: 22px 0 0;
+  color: #8a4c25;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+/* ─── Three.js canvas ────────────────────────────────────────── */
+.temple-canvas {
+  position: fixed;
+  top: 0;               /* FIX: was 72px — must match hero top:0 */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  width: 100%;
+  height: 100svh;       /* FIX: full viewport, not offset */
+  filter: drop-shadow(0 38px 58px rgba(79, 23, 10, 0.36));
+  pointer-events: none;
+  transform: scale(calc(0.96 + var(--p) * 0.04));
+  transform-origin: center bottom;
+}
+
+/* ─── Music button ───────────────────────────────────────────── */
+.music-toggle {
+  position: absolute;
+  top: clamp(16px, 3vw, 34px);
+  right: clamp(16px, 3vw, 38px);
+  z-index: 12;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 238, 190, 0.46);
+  border-radius: 999px;
+  background: rgba(255, 248, 231, 0.82);
+  color: #3d160b;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 900;
+  box-shadow: 0 18px 44px rgba(73, 26, 12, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.music-toggle span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b71516;
+  box-shadow: 0 0 0 5px rgba(183, 21, 22, 0.14);
+}
+
+.music-toggle.is-playing {
+  background: #7f1d12;
+  color: #fff8e7;
+}
+
+.music-toggle.is-playing span {
+  background: #ffd36f;
+  animation: pulse 1.3s ease-in-out infinite;
+}
+
+/* ─── Hero overlays ──────────────────────────────────────────── */
+
+/* Name panel — bottom-left */
+.name-panel {
+  position: absolute;
+  z-index: 10;
+  left: clamp(22px, 5vw, 86px);
+  bottom: clamp(34px, 8vh, 90px);
+  width: min(520px, calc(50% - 44px));   /* FIX: cap at half viewport so it never overlaps invite */
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(255, 224, 143, 0.34);
+  background:
+    linear-gradient(135deg, rgba(92, 24, 13, 0.88), rgba(38, 14, 9, 0.72)),
+    rgba(80, 22, 10, 0.74);
+  color: #fff8e7;
+  box-shadow: 0 30px 78px rgba(57, 18, 8, 0.28);
+  text-shadow: 0 4px 24px rgba(76, 20, 8, 0.34);
+  backdrop-filter: blur(16px);
+  opacity: var(--name-reveal);
+  transform: translate(var(--name-x), var(--name-y));
+  will-change: transform, opacity;       /* FIX: composited layer for smooth animation */
+}
+
+.name-panel::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255, 224, 143, 0.22);
+  pointer-events: none;
+}
+
+.kicker {
+  margin: 0;
+  color: #9d2c17;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.78rem;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.name-panel .kicker {
+  color: rgba(255, 249, 226, 0.88);
+}
+
+.name-panel h1 {
+  margin: 18px 0 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(3rem, 6.2vw, 6.3rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.88;
+}
+
+.name-panel p:not(.kicker) {
+  max-width: 500px;
+  margin: 24px 0 0;
+  color: rgba(255, 249, 226, 0.88);
+  font-size: clamp(1rem, 1.4vw, 1.24rem);
+  line-height: 1.65;
+}
+
+/* Blessing panel — top-right */
+.blessing-panel {
+  position: absolute;
+  right: clamp(24px, 7vw, 120px);
+  top: clamp(90px, 16vh, 160px);        /* FIX: was overlapping badge at small heights */
+  z-index: 10;
+  width: min(330px, calc(44% - 32px));  /* FIX: cap so it never overlaps name panel */
+  padding: 20px 24px;
+  border-left: 4px solid #ffd36f;
+  background: rgba(255, 248, 231, 0.76);
+  color: #4a1a0e;
+  box-shadow: 0 22px 60px rgba(57, 18, 8, 0.18);
+  backdrop-filter: blur(14px);
+  opacity: var(--blessing-reveal);
+  transform: translate(var(--blessing-x), var(--blessing-y));
+  will-change: transform, opacity;
+}
+
+.blessing-panel span {
+  color: #9d2c17;
+}
+
+.blessing-panel p {
+  margin: 8px 0 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.12;
+}
+
+/* Date/invite panel — bottom-right */
+.hero-invite {
+  position: absolute;
+  right: clamp(18px, 5vw, 86px);
+  bottom: clamp(24px, 7vh, 82px);
+  z-index: 10;
+  width: min(330px, calc(44% - 32px));  /* FIX: symmetric cap matching blessing-panel */
+  padding: 24px;
+  border: 1px solid rgba(255, 236, 180, 0.36);
+  background: rgba(80, 22, 10, 0.72);
+  color: #fff8e7;
+  box-shadow: 0 28px 72px rgba(57, 18, 8, 0.26);
+  backdrop-filter: blur(16px);
+  opacity: var(--details-reveal);
+  transform: translateY(var(--details-y));
+  will-change: transform, opacity;
+}
+
+.hero-invite span,
+.hero-invite small {
+  display: block;
+  color: #ffd578;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.hero-invite strong {
+  display: block;
+  margin: 12px 0 10px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ─── Scroll indicator ───────────────────────────────────────── */
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  z-index: 6;
+  width: 30px;
+  height: 48px;
+  border: 1px solid rgba(255, 248, 231, 0.52);
+  border-radius: 999px;
+  opacity: calc(var(--intro-reveal) * 0.9);
+  transform: translateX(-50%);
+}
+
+.scroll-cue span {
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  width: 5px;
+  height: 10px;
+  border-radius: 999px;
+  background: #fff8e7;
+  animation: cue-drop 1.4s ease-in-out infinite;
+}
+
+/* ─── Content sections ───────────────────────────────────────── */
+.blessing-section,
+.ritual-section,
+.photo-section,
+.venue-section {
+  position: relative;
+  z-index: 8;
+  width: min(1160px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.scroll-chapter {
+  min-height: 86vh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(28px, 6vw, 82px);
+  align-items: center;
+  padding: 72px 0;
+}
+
+.scroll-chapter-left {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+}
+
+.chapter-spacer {
+  min-height: 420px;
+}
+
+/* FIX: Uniform animation-range across all chapter cards */
+.chapter-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(28px, 5vw, 66px);
+  border: 1px solid rgba(142, 55, 24, 0.16);
+  background:
+    linear-gradient(135deg, rgba(255, 251, 239, 0.9), rgba(255, 239, 203, 0.66)),
+    rgba(255, 249, 234, 0.72);
+  box-shadow: 0 30px 86px rgba(96, 42, 16, 0.12);
+  backdrop-filter: blur(8px);
+  animation-fill-mode: both;
+  animation-timing-function: linear;
+  animation-timeline: view();
+  animation-range: entry 8% cover 38%;   /* FIX: was entry 6% cover 42% — more gradual */
+}
+
+.scroll-chapter-right .chapter-card {
+  animation-name: chapter-from-right;
+}
+
+.scroll-chapter-left .chapter-card {
+  animation-name: chapter-from-left;
+}
+
+.chapter-card::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(157, 44, 23, 0.12);
+  pointer-events: none;
+}
+
+.chapter-card h2 {
+  margin: 18px 0 0;
+  color: #23130d;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.1rem, 4.7vw, 5rem);
+  font-weight: 400;
+  line-height: 1.02;
+}
+
+.couple-line {
+  margin: 0 0 16px;
+  color: #7f1d12;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 5.6rem);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+/* ─── Blessing section ───────────────────────────────────────── */
+.blessing-section {
+  padding-top: 76px;
+}
+
+.blessing-card {
+  background:
+    radial-gradient(circle at 100% 0, rgba(255, 192, 80, 0.22), transparent 30%),
+    rgba(255, 249, 234, 0.72);
+}
+
+.blessing-card h2,
+.photo-copy h2,
+.venue-section h2 {
+  margin: 18px 0 0;
+  color: #23130d;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.1rem, 4.8vw, 5.2rem);
+  font-weight: 400;
+  line-height: 1.02;
+}
+
+/* ─── Ritual section ─────────────────────────────────────────── */
+.ritual-section {
+  align-items: start;
+}
+
+.ritual-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  align-self: center;
+  animation: chapter-from-right linear both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 40%;  /* FIX: aligned with chapter-card range */
+}
+
+/* FIX: Stagger ritual articles evenly instead of all sharing the same range */
+.ritual-section article {
+  min-height: 190px;
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid rgba(142, 55, 24, 0.14);
+  background: rgba(255, 249, 234, 0.72);
+  backdrop-filter: blur(4px);
+  animation: reveal-up linear both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 36%;  /* FIX: was entry 10% cover 34% — smoother */
+}
+
+.ritual-section article:nth-child(1) { animation-range: entry 8%  cover 32%; }
+.ritual-section article:nth-child(2) { animation-range: entry 12% cover 36%; }
+.ritual-section article:nth-child(3) { animation-range: entry 16% cover 40%; }
+
+.ritual-section span {
+  color: #9d2c17;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.4rem;
+  font-style: italic;
+}
+
+.ritual-section h2 {
+  margin: 22px 0 14px;
+  color: #23130d;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.65rem, 3vw, 3.1rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.ritual-section p,
+.photo-copy p:not(.kicker),
+.venue-section p {
+  margin: 0;
+  color: #6d4a33;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+/* ─── Photo section ──────────────────────────────────────────── */
+.photo-section {
+  grid-template-columns: minmax(0, 0.42fr) minmax(260px, 0.7fr) minmax(0, 0.88fr);
+}
+
+.photo-arch {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border-radius: 300px 300px 10px 10px;
+  box-shadow: 0 34px 90px rgba(96, 42, 16, 0.16);
+  animation: chapter-from-left linear both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 36%;  /* FIX: unified range */
+}
+
+.photo-arch::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(255, 249, 226, 0.72);
+  border-radius: inherit;
+}
+
+.photo-arch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-copy {
+  border-left: 5px solid #9d2c17;
+  background: linear-gradient(135deg, rgba(255, 249, 234, 0.76), rgba(248, 216, 163, 0.58));
+}
+
+.photo-copy p:not(.kicker) {
+  margin-top: 26px;
+}
+
+/* ─── Venue section ──────────────────────────────────────────── */
+.venue-section {
+  padding-bottom: 126px;
+}
+
+.temple-route {
+  position: relative;
+  min-height: 440px;
+  overflow: hidden;
+  border: 1px solid rgba(142, 55, 24, 0.16);
+  background:
+    radial-gradient(circle at 20% 24%, rgba(244, 160, 58, 0.24), transparent 20%),
+    radial-gradient(circle at 78% 74%, rgba(22, 107, 62, 0.18), transparent 22%),
+    #fff0cf;
+  box-shadow: 0 28px 72px rgba(96, 42, 16, 0.1);
+}
+
+.route-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(142, 55, 24, 0.08) 0 1px, transparent 1px 74px),
+    linear-gradient(180deg, rgba(142, 55, 24, 0.08) 0 1px, transparent 1px 74px);
+}
+
+.route-road {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255, 250, 235, 0.74);
+  box-shadow: inset 0 0 0 1px rgba(142, 55, 24, 0.08);
+}
+
+.route-road-main {
+  left: -8%;
+  top: 52%;
+  width: 116%;
+  height: 42px;
+  transform: rotate(-10deg);
+}
+
+.route-road-side {
+  left: 47%;
+  top: -8%;
+  width: 34px;
+  height: 118%;
+  transform: rotate(18deg);
+}
+
+.route-marker {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 220px;
+  padding: 22px;
+  background: #7f1d12;
+  color: #fff8e7;
+  box-shadow: 0 24px 54px rgba(127, 29, 18, 0.24);
+  transform: translate(-50%, -50%);
+}
+
+.route-marker span {
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 28px;
+  height: 28px;
+  background: #7f1d12;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.route-marker strong,
+.route-marker small {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.route-marker strong {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.route-marker small {
+  margin-top: 7px;
+  color: rgba(255, 248, 231, 0.72);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 920px) {
+  .gopuram-scroll {
+    min-height: 240vh;
+  }
+
+  /* FIX: hero top must stay 0 to match canvas; inner padding handles visual offset */
+  .gopuram-hero {
+    top: 0;
+    min-height: 100svh;
+    padding: 76px 16px 32px;
+  }
+
+  /* FIX: canvas top stays 0 at all breakpoints */
+  .temple-canvas {
+    top: 0;
+    height: 100svh;
+  }
+
+  .name-panel {
+    left: 16px;
+    right: 16px;
+    bottom: 112px;
+    width: auto;          /* FIX: let it fill the space properly on mobile */
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .opening-title {
+    left: 18px;
+    right: 18px;
+    top: 26%;
+    width: auto;
+    text-align: center;
+  }
+
+  .opening-title h2 {
+    font-size: clamp(3rem, 16vw, 5.8rem);
+  }
+
+  .name-panel h1 {
+    font-size: clamp(3.4rem, 16vw, 6.2rem);
+  }
+
+  .blessing-panel {
+    left: 16px;
+    right: 16px;
+    top: 72px;            /* FIX: sits just below any nav bar padding */
+    width: auto;
+    max-width: none;
+    text-align: center;
+  }
+
+  .hero-invite {
+    left: 16px;
+    right: 16px;
+    bottom: 22px;
+    width: auto;
+    max-width: none;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .ritual-section,
+  .photo-section,
+  .venue-section {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 58px 0;
+  }
+
+  .scroll-chapter,
+  .scroll-chapter-left,
+  .photo-section {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-spacer {
+    min-height: 280px;
+  }
+
+  .ritual-section {
+    padding: 34px 0 48px;
+  }
+
+  .ritual-section article {
+    min-height: auto;
+  }
+
+  .photo-section,
+  .venue-section {
+    padding: 36px 0;
+  }
+
+  .photo-arch {
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 560px) {
+  .music-toggle {
+    top: 14px;
+    right: 12px;
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 0.66rem;
+  }
+
+  .blessing-section,
+  .ritual-section,
+  .photo-section,
+  .venue-section {
+    width: min(100% - 28px, 520px);
+  }
+
+  .blessing-section {
+    padding: 44px 0 24px;
+  }
+
+  .kicker,
+  .hero-invite span,
+  .hero-invite small {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+  }
+
+  .blessing-card h2,
+  .photo-copy h2,
+  .venue-section h2 {
+    font-size: clamp(1.7rem, 9vw, 2.55rem);
+    line-height: 1.08;
+  }
+
+  .ritual-section h2 {
+    margin-top: 24px;
+    font-size: clamp(1.45rem, 7vw, 2rem);
+  }
+
+  .ritual-section p,
+  .photo-copy p:not(.kicker),
+  .venue-section p {
+    font-size: 0.88rem;
+    line-height: 1.62;
+  }
+
+  .photo-copy {
+    padding: 22px 18px;
+    border-left-width: 3px;
+  }
+
+  .photo-arch,
+  .temple-route {
+    min-height: 320px;
+  }
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────── */
+@keyframes cloud-drift {
+  to { translate: 44px 8px; }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chapter-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(84px) translateY(34px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+@keyframes chapter-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-84px) translateY(34px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+@keyframes chapter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(54px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(0.72);
+    opacity: 0.72;
+  }
+}
+
+@keyframes cue-drop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+  35% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 18px);
+  }
+}

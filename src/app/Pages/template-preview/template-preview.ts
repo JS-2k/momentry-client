@@ -6,10 +6,11 @@ import { map } from 'rxjs';
 import { findInvitationTemplate } from '../../data/templates.data';
 import { KanchiThoranam } from '../../template-designs/weddings/kanchi-thoranam/kanchi-thoranam';
 import { MoonlitJasmine } from '../../template-designs/weddings/moonlit-jasmine/moonlit-jasmine';
+import { SuryaGopuram } from '../../template-designs/weddings/surya-gopuram/surya-gopuram';
 
 @Component({
   selector: 'app-template-preview',
-  imports: [RouterLink, MoonlitJasmine, KanchiThoranam],
+  imports: [RouterLink, MoonlitJasmine, KanchiThoranam, SuryaGopuram],
   templateUrl: './template-preview.html',
   styleUrl: './template-preview.css',
 })

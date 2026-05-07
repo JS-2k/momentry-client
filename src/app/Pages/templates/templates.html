@@ -36,13 +36,22 @@
     @for (template of filteredTemplates; track template.title) {
       <article class="wedding-template-card">
         <div class="card-art" [class]="'card-art card-art-' + template.slug" aria-hidden="true">
+          @if (template.slug === 'surya-gopuram') {
+            <div class="gallery-sun"></div>
+            <div class="gallery-gopuram">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          }
           <div class="envelope-back"></div>
           <div class="invitation-sheet">
-            <img [src]="template.slug === 'kanchi-thoranam' ? '/assets/indian-wedding.jpg' : '/assets/wedding.jpg'" alt="" />
+            <img [src]="template.slug === 'moonlit-jasmine' ? '/assets/wedding.jpg' : '/assets/indian-wedding.jpg'" alt="" />
             <div class="sheet-copy">
               <span>{{ template.category }}</span>
-              <strong>{{ template.slug === 'kanchi-thoranam' ? 'Meera & Arjun' : 'Ava & Leo' }}</strong>
-              <small>{{ template.slug === 'kanchi-thoranam' ? '24 Aug 2026' : '12 Jun 2026' }}</small>
+              <strong>{{ template.slug === 'moonlit-jasmine' ? 'Ava & Leo' : 'Meera & Arjun' }}</strong>
+              <small>{{ template.slug === 'moonlit-jasmine' ? '12 Jun 2026' : '24 Aug 2026' }}</small>
             </div>
           </div>
           <div class="wax-seal">{{ template.slug === 'kanchi-thoranam' ? 'ஸ்ரீ' : 'M' }}</div>
