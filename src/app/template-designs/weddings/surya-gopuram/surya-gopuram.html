@@ -1,51 +1,59 @@
 <article class="surya-page" aria-label="Surya Gopuram wedding invitation">
   <audio #musicPlayer src="/assets/music/kanchi.mp3" loop preload="metadata"></audio>
 
-  <div class="gopuram-scroll">
-    <section class="gopuram-hero" aria-labelledby="surya-title">
+  <button
+    type="button"
+    class="music-toggle"
+    [class.is-playing]="isMusicPlaying"
+    (click)="toggleMusic()"
+  >
+    <span aria-hidden="true"></span>
+    {{ isMusicPlaying ? 'Pause nadaswaram' : 'Play nadaswaram' }}
+  </button>
+
+  <section #storyStage class="story-stage" aria-labelledby="surya-title">
+    <div #cinematicPin class="cinematic-pin">
       <div class="sunrise-sky" aria-hidden="true">
         <div class="sun-core"></div>
         <div class="sun-halo"></div>
         <div class="temple-rays"></div>
-        <div class="cloud-band cloud-band-one"></div>
-        <div class="cloud-band cloud-band-two"></div>
+        <div class="mist mist-one"></div>
+        <div class="mist mist-two"></div>
       </div>
 
-      <canvas #templeCanvas class="temple-canvas" aria-hidden="true"></canvas>
-
-      <button
-        type="button"
-        class="music-toggle"
-        [class.is-playing]="isMusicPlaying"
-        (click)="toggleMusic()"
-      >
-        <span aria-hidden="true"></span>
-        {{ isMusicPlaying ? 'Pause nadaswaram' : 'Play nadaswaram' }}
-      </button>
-
-      <div class="temple-badge">
-        <span>Scroll to open</span>
-        <strong>Sri Ganapathi thunai</strong>
+      <div class="particle-field" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
       </div>
 
-      <div class="opening-title">
-        <span>Subha Vivaham</span>
-        <h2>Arun <small>weds</small> Ramya</h2>
-        <p>With the blessings of our families</p>
+      <div class="temple-stage">
+        <div class="temple-aura" aria-hidden="true"></div>
+        <canvas #templeCanvas class="temple-canvas" aria-hidden="true"></canvas>
+        <div class="temple-shadow" aria-hidden="true"></div>
       </div>
 
-      <div class="hero-copy name-panel">
-        <p class="kicker">Temple wedding invitation</p>
+      <div class="hero-title">
+        <p class="eyebrow">Subha Vivaham</p>
         <h1 id="surya-title">{{ invitation.couple }}</h1>
         <p>{{ invitation.headline }}</p>
       </div>
 
-      <div class="blessing-panel">
-        <span>With blessings</span>
-        <p>{{ invitation.blessing }}</p>
+      <div class="story-moment story-moment-one">
+        <span>Chapter One</span>
+        <p>When two journeys became one under a sky of gold.</p>
       </div>
 
-      <div class="hero-invite">
+      <div class="story-moment story-moment-two">
+        <span>Chapter Two</span>
+        <p>Under the blessings of family, prayer, and temple bells.</p>
+      </div>
+
+      <div class="story-moment story-moment-three">
+        <span>Chapter Three</span>
+        <p>At sunrise beside the temple, a sacred promise begins.</p>
+      </div>
+
+      <div class="date-seal">
         <span>Subha Muhurtham</span>
         <strong>{{ invitation.date }}</strong>
         <small>{{ invitation.muhurtham }}</small>
@@ -54,62 +62,69 @@
       <div class="scroll-cue" aria-hidden="true">
         <span></span>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 
-  <section class="blessing-section scroll-chapter scroll-chapter-right">
-    <div class="chapter-spacer" aria-hidden="true"></div>
-    <div class="blessing-card chapter-card">
-      <p class="couple-line">{{ invitation.couple }}</p>
-      <p class="kicker">{{ invitation.blessing }}</p>
+  <section class="event-reel" aria-label="Wedding events">
+    <div class="section-heading reveal-soft">
+      <p class="eyebrow">Ceremonial Timeline</p>
+      <h2>Four scenes from a sacred celebration.</h2>
+    </div>
+
+    <div class="event-scenes">
+      <article class="event-card event-engagement">
+        <span>01</span>
+        <p>Engagement</p>
+        <h3>Rings exchanged in the glow of lamps and jasmine.</h3>
+      </article>
+      <article class="event-card event-muhurtham">
+        <span>02</span>
+        <p>Muhurtham</p>
+        <h3>The sacred knot is tied as nadaswaram fills the morning.</h3>
+      </article>
+      <article class="event-card event-reception">
+        <span>03</span>
+        <p>Reception</p>
+        <h3>Silk, gold, music, and blessings gather into the evening.</h3>
+      </article>
+      <article class="event-card event-dinner">
+        <span>04</span>
+        <p>Dinner</p>
+        <h3>A festive virundhu served with family warmth.</h3>
+      </article>
+    </div>
+  </section>
+
+  <section class="details-section" aria-label="Wedding details">
+    <div class="details-copy reveal-soft">
+      <p class="eyebrow">With Blessings</p>
       <h2>{{ invitation.message }}</h2>
     </div>
-  </section>
 
-  <section class="ritual-section scroll-chapter scroll-chapter-left" aria-label="Wedding rituals">
-    <div class="chapter-card chapter-card-wide">
-      <p class="kicker">Sacred rituals</p>
-      <h2>The morning opens with prayer, music, and family blessings.</h2>
-    </div>
-    <div class="ritual-grid">
-    <article>
-      <span>01</span>
-      <h2>Ganapathi pooja</h2>
-      <p>The day begins with lamps, flowers, and prayers for a beautiful new journey.</p>
-    </article>
-    <article>
-      <span>02</span>
-      <h2>Muhurtham</h2>
-      <p>The couple exchange vows as the temple bells and nadaswaram fill the morning air.</p>
-    </article>
-    <article>
-      <span>03</span>
-      <h2>Virundhu</h2>
-      <p>A warm banana-leaf lunch is served with family blessings and festive conversation.</p>
-    </article>
-    </div>
-  </section>
-
-  <section class="photo-section scroll-chapter scroll-chapter-right">
-    <div class="chapter-spacer" aria-hidden="true"></div>
-    <div class="photo-arch">
-      <img src="/assets/indian-wedding.jpg" alt="Traditional Indian wedding celebration" />
-    </div>
-    <div class="photo-copy chapter-card">
-      <p class="kicker">Auspicious celebration</p>
-      <h2>Every detail glows with turmeric, silk, jasmine, and gold.</h2>
-      <p>{{ invitation.reception }}</p>
-    </div>
-  </section>
-
-  <section class="venue-section scroll-chapter scroll-chapter-left">
-    <div class="chapter-card">
-      <p class="kicker">Wedding venue</p>
-      <h2>{{ invitation.venue }}</h2>
-      <p>{{ invitation.location }}</p>
+    <div class="details-grid">
+      <article class="detail-card magnetic-card">
+        <span>Date</span>
+        <strong>{{ invitation.date }}</strong>
+        <p>{{ invitation.muhurtham }}</p>
+      </article>
+      <article class="detail-card magnetic-card">
+        <span>Venue</span>
+        <strong>{{ invitation.venue }}</strong>
+        <p>{{ invitation.location }}</p>
+      </article>
+      <article class="detail-card magnetic-card">
+        <span>Reception</span>
+        <strong>Evening Blessings</strong>
+        <p>{{ invitation.reception }}</p>
+      </article>
+      <article class="detail-card magnetic-card">
+        <span>RSVP</span>
+        <strong>Join the celebration</strong>
+        <p>Kindly arrive with your family and blessings.</p>
+      </article>
     </div>
 
-    <div class="temple-route" aria-label="Venue map preview">
+    <div class="map-card reveal-soft" aria-label="Venue map preview">
       <div class="route-grid" aria-hidden="true"></div>
       <div class="route-road route-road-main" aria-hidden="true"></div>
       <div class="route-road route-road-side" aria-hidden="true"></div>
@@ -119,5 +134,13 @@
         <small>Temple street entrance</small>
       </div>
     </div>
+  </section>
+
+  <section class="final-blessing" aria-label="Final blessing">
+    <div class="petal-field" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p class="eyebrow reveal-soft">{{ invitation.blessing }}</p>
+    <h2 class="reveal-soft">Your presence is the greatest blessing.</h2>
   </section>
 </article>

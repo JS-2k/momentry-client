@@ -1,13 +1,5 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostListener,
-  inject,
-  OnDestroy,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import type Lenis from 'lenis';
 import type * as Three from 'three';
 import type { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { SURYA_GOPURAM_INVITATION } from './surya-gopuram.data';
@@ -21,9 +13,8 @@ import { SURYA_GOPURAM_INVITATION } from './surya-gopuram.data';
 export class SuryaGopuram implements AfterViewInit, OnDestroy {
   @ViewChild('templeCanvas') private readonly templeCanvas?: ElementRef<HTMLCanvasElement>;
   @ViewChild('musicPlayer') private readonly musicPlayer?: ElementRef<HTMLAudioElement>;
-
-  private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly renderer2 = inject(Renderer2);
+  @ViewChild('storyStage') private readonly storyStage?: ElementRef<HTMLElement>;
+  @ViewChild('cinematicPin') private readonly cinematicPin?: ElementRef<HTMLElement>;
 
   readonly invitation = SURYA_GOPURAM_INVITATION;
   isMusicPlaying = false;
@@ -34,24 +25,34 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
   private camera?: Three.PerspectiveCamera;
   private templeModel?: Three.Group;
   private modelBasePosition?: Three.Vector3;
-  private ganeshaModel?: Three.Group;
-  private ganeshaBasePosition?: Three.Vector3;
-  private ganeshaBaseScale = 1;
   private frameId = 0;
   private clock?: Three.Clock;
   private isCompactViewport = false;
-  private scrollProgress = 0;
+  private storyProgress = 0;
   private pageProgress = 0;
+  private lenis?: Lenis;
+  private gsapTicker?: (time: number) => void;
+  private gsapModule?: typeof import('gsap').gsap;
+  private scrollTrigger?: typeof import('gsap/ScrollTrigger').ScrollTrigger;
+  private animationContext?: gsap.Context;
 
   ngAfterViewInit() {
     void this.createTempleScene();
+    void this.createScrollExperience();
     void this.startMusic();
-    this.onScroll();
   }
 
   ngOnDestroy() {
     cancelAnimationFrame(this.frameId);
     this.musicPlayer?.nativeElement.pause();
+    this.animationContext?.revert();
+    this.scrollTrigger?.getAll().forEach((trigger) => trigger.kill());
+
+    if (this.gsapTicker) {
+      this.gsapModule?.ticker.remove(this.gsapTicker);
+    }
+
+    this.lenis?.destroy();
     this.renderer?.dispose();
     this.scene?.traverse((object) => {
       const mesh = object as Three.Mesh;
@@ -76,58 +77,7 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     this.isCompactViewport = window.matchMedia('(max-width: 820px)').matches;
     this.resizeRenderer();
     this.frameTemple();
-    this.onScroll();
-  }
-
-  @HostListener('window:scroll')
-  onScroll() {
-    const scrollStage = this.host.nativeElement.querySelector('.gopuram-scroll');
-    const page = this.host.nativeElement.querySelector('.surya-page');
-
-    if (!scrollStage || !page) {
-      return;
-    }
-
-    const rect = scrollStage.getBoundingClientRect();
-    const scrollRange = Math.max(1, rect.height - window.innerHeight);
-    this.scrollProgress = this.clamp(-rect.top / scrollRange, 0, 1);
-
-    const pageRect = page.getBoundingClientRect();
-    const pageScrollRange = Math.max(1, pageRect.height - window.innerHeight);
-    this.pageProgress = this.clamp(-pageRect.top / pageScrollRange, 0, 1);
-
-    this.renderer2.setStyle(
-      this.host.nativeElement,
-      '--surya-progress',
-      String(this.scrollProgress),
-    );
-
-    // FIX: Evenly-spaced phase windows — each panel gets an equal 0.20 wide band
-    // with a 0.06 gap before the next one starts, preventing overlap and pop.
-    //
-    //  intro :  1.0 → 0.0   over [0.00 – 0.20]
-    //  name  :  0.0 → 1.0   over [0.26 – 0.46]
-    //  bless :  0.0 → 1.0   over [0.44 – 0.64]
-    //  detail:  0.0 → 1.0   over [0.62 – 0.82]
-    //
-    // The slight overlaps between name/blessing (0.44 vs 0.46) and
-    // blessing/detail (0.62 vs 0.64) are intentional — they create a
-    // natural cascade feel without jarring pauses.
-
-    const introReveal   = 1 - this.phase(this.scrollProgress, 0.00, 0.20);
-    const nameReveal    = this.phase(this.scrollProgress, 0.26, 0.46);
-    const blessingReveal = this.phase(this.scrollProgress, 0.44, 0.64);
-    const detailsReveal  = this.phase(this.scrollProgress, 0.62, 0.82);
-
-    this.renderer2.setStyle(this.host.nativeElement, '--intro-reveal',    String(introReveal));
-    this.renderer2.setStyle(this.host.nativeElement, '--name-reveal',     String(nameReveal));
-    this.renderer2.setStyle(this.host.nativeElement, '--name-x',          `${-42 + nameReveal * 42}px`);
-    this.renderer2.setStyle(this.host.nativeElement, '--name-y',          `${28  - nameReveal * 28}px`);
-    this.renderer2.setStyle(this.host.nativeElement, '--blessing-reveal',  String(blessingReveal));
-    this.renderer2.setStyle(this.host.nativeElement, '--blessing-x',       `${36  - blessingReveal * 36}px`);
-    this.renderer2.setStyle(this.host.nativeElement, '--blessing-y',       `${-18 + blessingReveal * 18}px`);
-    this.renderer2.setStyle(this.host.nativeElement, '--details-reveal',   String(detailsReveal));
-    this.renderer2.setStyle(this.host.nativeElement, '--details-y',        `${44  - detailsReveal * 44}px`);
+    this.scrollTrigger?.refresh();
   }
 
   async toggleMusic() {
@@ -137,6 +87,165 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     }
 
     await this.startMusic();
+  }
+
+  private async createScrollExperience() {
+    const stage = this.storyStage?.nativeElement;
+    const pin = this.cinematicPin?.nativeElement;
+
+    if (!stage || !pin) {
+      return;
+    }
+
+    const [{ gsap }, { ScrollTrigger }, lenisModule] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+      import('lenis'),
+    ]);
+    const Lenis = lenisModule.default;
+
+    gsap.registerPlugin(ScrollTrigger);
+    this.gsapModule = gsap;
+    this.scrollTrigger = ScrollTrigger;
+    const lenis = new Lenis({
+      duration: 1.35,
+      easing: (time: number) => Math.min(1, 1.001 - Math.pow(2, -10 * time)),
+      smoothWheel: true,
+    });
+    this.lenis = lenis;
+    lenis.on('scroll', () => ScrollTrigger.update());
+    this.gsapTicker = (time: number) => this.lenis?.raf(time * 1000);
+    gsap.ticker.add(this.gsapTicker);
+    gsap.ticker.lagSmoothing(0);
+
+    this.animationContext = gsap.context(() => {
+      const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      intro
+        .from('.sunrise-sky', { opacity: 0, duration: 1.2 })
+        .from('.temple-stage', { opacity: 0, scale: 0.9, filter: 'blur(22px)', duration: 2.1 }, 0.15)
+        .from('.hero-title .eyebrow, .hero-title h1, .hero-title p', {
+          opacity: 0,
+          y: 34,
+          filter: 'blur(12px)',
+          duration: 1.15,
+          stagger: 0.18,
+        }, 0.82)
+        .from('.date-seal', { opacity: 0, y: 28, filter: 'blur(10px)', duration: 1 }, 1.25);
+
+      const story = gsap.timeline({
+        scrollTrigger: {
+          trigger: stage,
+          start: 'top top',
+          end: '+=560%',
+          pin,
+          scrub: 1.8,
+          anticipatePin: 1,
+          onUpdate: (self) => this.updateStoryProgress(self.progress),
+        },
+      });
+
+      story
+        .to('.hero-title', { opacity: 0, y: -60, filter: 'blur(8px)', duration: 0.62 }, 0.12)
+        .to('.date-seal', { opacity: 0, y: 34, filter: 'blur(6px)', duration: 0.5 }, 0.12)
+        .fromTo('.story-moment-one', { opacity: 0, y: 42, filter: 'blur(6px)' }, {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.42,
+        }, 0.2)
+        .to('.story-moment-one', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.18 }, 0.42)
+        .to('.story-moment-one', { opacity: 0, y: -32, filter: 'blur(5px)', duration: 0.24 }, 0.56)
+        .fromTo('.story-moment-two', { opacity: 0, y: 42, filter: 'blur(6px)' }, {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.42,
+        }, 0.58)
+        .to('.story-moment-two', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.18 }, 0.78)
+        .to('.story-moment-two', { opacity: 0, y: -32, filter: 'blur(5px)', duration: 0.24 }, 0.9)
+        .fromTo('.story-moment-three', { opacity: 0, y: 42, filter: 'blur(6px)' }, {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.42,
+        }, 0.88)
+        .to('.story-moment-three', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.18 }, 1.06)
+        .to('.story-moment-three', { opacity: 0, y: -26, filter: 'blur(5px)', duration: 0.2 }, 1.16)
+        .to('.temple-stage', { scale: 1.08, duration: 1 }, 0);
+
+      gsap.utils.toArray<HTMLElement>('.event-card').forEach((card, index) => {
+        gsap.from(card, {
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 78%',
+            end: 'top 44%',
+            scrub: 0.9,
+          },
+          opacity: 0,
+          y: 88,
+          scale: 0.94,
+          filter: 'blur(16px)',
+          rotateX: index % 2 === 0 ? 8 : -8,
+          ease: 'power2.out',
+        });
+      });
+
+      gsap.from('.detail-card', {
+        scrollTrigger: {
+          trigger: '.details-grid',
+          start: 'top 78%',
+          end: 'bottom 58%',
+          scrub: 0.8,
+        },
+        opacity: 0,
+        y: 58,
+        stagger: 0.11,
+        filter: 'blur(12px)',
+        ease: 'power2.out',
+      });
+
+      gsap.utils.toArray<HTMLElement>('.reveal-soft').forEach((item) => {
+        gsap.from(item, {
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 82%',
+            end: 'top 56%',
+            scrub: 0.85,
+          },
+          opacity: 0,
+          y: 54,
+          filter: 'blur(14px)',
+          ease: 'power2.out',
+        });
+      });
+
+      gsap.utils.toArray<HTMLElement>('.magnetic-card').forEach((card) => {
+        card.addEventListener('pointermove', (event) => this.moveMagneticCard(event, card));
+        card.addEventListener('pointerleave', () => gsap.to(card, { x: 0, y: 0, duration: 0.55, ease: 'power3.out' }));
+      });
+
+      ScrollTrigger.refresh();
+    });
+  }
+
+  private updateStoryProgress(progress: number) {
+    this.storyProgress = progress;
+    this.pageProgress = window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    this.setHostProgress('--story-progress', progress);
+    this.setHostProgress('--page-progress', this.pageProgress);
+  }
+
+  private moveMagneticCard(event: PointerEvent, card: HTMLElement) {
+    const gsap = this.gsapModule;
+
+    if (!gsap || window.matchMedia('(pointer: coarse)').matches) {
+      return;
+    }
+
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left - rect.width / 2) * 0.08;
+    const y = (event.clientY - rect.top - rect.height / 2) * 0.08;
+    gsap.to(card, { x, y, duration: 0.38, ease: 'power3.out' });
   }
 
   private pauseMusic() {
@@ -157,7 +266,7 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
       return;
     }
 
-    audio.volume = 0.36;
+    audio.volume = 0.32;
 
     try {
       await audio.play();
@@ -184,8 +293,8 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     this.isCompactViewport = window.matchMedia('(max-width: 820px)').matches;
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-    this.camera.position.set(0, 1.1, 9);
+    this.camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+    this.camera.position.set(0, 0.36, 9.6);
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -197,16 +306,16 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.22;
+    this.renderer.toneMappingExposure = 1.32;
 
-    const ambientLight = new THREE.HemisphereLight(0xffead0, 0x5c2a1b, 2.2);
-    const sunLight = new THREE.DirectionalLight(0xffc46a, 4.8);
-    const frontLight = new THREE.DirectionalLight(0xfff7df, 2.2);
-    const lampGlow = new THREE.PointLight(0xff8f2f, 18, 14);
-    sunLight.position.set(0, 5.2, -3.4);
-    frontLight.position.set(3.4, 3.8, 6.2);
-    lampGlow.position.set(-2.6, 0.8, 3.4);
-    this.scene.add(ambientLight, sunLight, frontLight, lampGlow);
+    const ambientLight = new THREE.HemisphereLight(0xffefd1, 0x3f140d, 2.35);
+    const sunriseLight = new THREE.DirectionalLight(0xffb85f, 5.2);
+    const frontLight = new THREE.DirectionalLight(0xfff5d7, 2.5);
+    const lampGlow = new THREE.PointLight(0xff8a2f, 19, 14);
+    sunriseLight.position.set(-1.2, 5.8, -3.2);
+    frontLight.position.set(3.2, 3.4, 6.4);
+    lampGlow.position.set(-2.2, 0.6, 3.1);
+    this.scene.add(ambientLight, sunriseLight, frontLight, lampGlow);
 
     const Loader = loaderModule.GLTFLoader as typeof GLTFLoader;
     new Loader().load(
@@ -231,7 +340,7 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     }
 
     const rect = canvas.getBoundingClientRect();
-    const width  = Math.max(1, Math.floor(rect.width));
+    const width = Math.max(1, Math.floor(rect.width));
     const height = Math.max(1, Math.floor(rect.height));
 
     this.renderer.setSize(width, height, false);
@@ -245,27 +354,23 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     }
 
     const THREE = this.THREE;
-    const box    = new THREE.Box3().setFromObject(this.templeModel);
-    const size   = box.getSize(new THREE.Vector3());
+    const box = new THREE.Box3().setFromObject(this.templeModel);
+    const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    const modelHeight  = Math.max(size.y, 1);
-    const targetHeight = this.isCompactViewport ? 3.15 : 3.75;
+    const modelHeight = Math.max(size.y, 1);
+    const targetHeight = this.isCompactViewport ? 3.15 : 4.05;
     const scale = targetHeight / modelHeight;
 
     this.templeModel.scale.setScalar(scale);
     this.templeModel.position.set(
       -center.x * scale,
-      -center.y * scale - 0.32,
+      -center.y * scale - (this.isCompactViewport ? 0.24 : 0.42),
       -center.z * scale,
     );
     this.modelBasePosition = this.templeModel.position.clone();
-    this.templeModel.rotation.set(0.01, -0.68, 0);
-    this.camera.position.set(
-      0,
-      this.isCompactViewport ? 0.28 : 0.34,
-      this.isCompactViewport ? 9.8  : 9.4,
-    );
-    this.camera.lookAt(0, 0.04, 0);
+    this.templeModel.rotation.set(0.015, -0.34, 0);
+    this.camera.position.set(0, this.isCompactViewport ? 0.32 : 0.42, this.isCompactViewport ? 9.8 : 9.15);
+    this.camera.lookAt(0, 0.08, 0);
   }
 
   private animate = () => {
@@ -278,59 +383,17 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     const elapsed = this.clock.elapsedTime;
 
     if (this.templeModel && this.modelBasePosition) {
-      const progress    = this.easeInOutCubic(this.scrollProgress);
-      const breathe     = Math.sin(elapsed * 0.72) * 0.018;
-      const turn        = -0.68 + progress * 1.08;
-      const revealLift  = progress * (this.isCompactViewport ? 0.16 : 0.26);
-      const depthPush   = (1 - progress) * (this.isCompactViewport ? 0.24 : 0.32);
+      const progress = this.easeInOutCubic(this.storyProgress);
+      const breathe = Math.sin(elapsed * 0.62) * 0.022;
+      const reveal = this.phase(progress, 0, 0.22);
+      const ceremonialTurn = Math.sin(progress * Math.PI) * 0.18;
 
-      // FIX: temple exit / side travel — widen the phase windows so the model
-      // glides out smoothly instead of snapping. Old values were too narrow
-      // (0.48–0.66) which caused a sudden jump on the boundary.
-      const templeExit  = this.phase(this.pageProgress, 0.52, 0.72);
-      const templeSide  =
-        -0.9 * this.phase(this.pageProgress, 0.18, 0.34) +
-         1.65 * this.phase(this.pageProgress, 0.40, 0.58);
-
-      this.templeModel.visible = templeExit < 0.98;
-      this.templeModel.rotation.x = 0.02 - progress * 0.03;
-      this.templeModel.rotation.y = turn + Math.sin(elapsed * 0.32) * 0.018;
-      this.templeModel.rotation.z = Math.sin(progress * Math.PI) * -0.018;
-      this.templeModel.position.x =
-        this.modelBasePosition.x + Math.sin(progress * Math.PI) * 0.08 + templeSide;
-      this.templeModel.position.y =
-        this.modelBasePosition.y + revealLift + breathe - templeExit * 1.1;
-      this.templeModel.position.z =
-        this.modelBasePosition.z + depthPush - templeExit * 2.8;
-    }
-
-    if (this.ganeshaModel && this.ganeshaBasePosition) {
-      // FIX: Ganesha reveal/exit windows widened to match temple's new rhythm.
-      // Old reveal [0.02–0.10] was too short — Ganesha popped in on first frame.
-      // Old exit [0.94–1.00] was tight — it vanished abruptly near the page end.
-      const ganeshaReveal = this.phase(this.pageProgress, 0.04, 0.14);
-      const ganeshaExit   = this.phase(this.pageProgress, 0.88, 0.98);
-      const travel        = this.easeInOutCubic(this.pageProgress);
-      const blessingFloat = Math.sin(elapsed * 0.9) * 0.014;
-      const maxX  = this.isCompactViewport ? 2.05 : 3.45;
-      const waveX = Math.sin(travel * Math.PI * 2.15 - Math.PI / 2) * maxX;
-      const waveY =
-        (this.isCompactViewport ? -0.82 : -0.72) +
-        Math.sin(travel * Math.PI * 3.4) * (this.isCompactViewport ? 0.46 : 0.62);
-      const sectionLift =
-        this.phase(this.pageProgress, 0.34, 0.72) * (this.isCompactViewport ? 0.28 : 0.38);
-
-      this.ganeshaModel.visible = ganeshaReveal > 0.02 && ganeshaExit < 0.98;
-      this.ganeshaModel.scale.setScalar(
-        this.ganeshaBaseScale * (0.78 + ganeshaReveal * 0.22 - ganeshaExit * 0.2),
-      );
-      this.ganeshaModel.rotation.x = 0.02 + Math.sin(travel * Math.PI * 2) * 0.06;
-      this.ganeshaModel.rotation.y =
-        0.42 + Math.sin(travel * Math.PI * 2.15) * 0.82 + Math.sin(elapsed * 0.36) * 0.012;
-      this.ganeshaModel.rotation.z = Math.sin(travel * Math.PI * 3.2) * 0.08;
-      this.ganeshaModel.position.x = waveX;
-      this.ganeshaModel.position.y = waveY + sectionLift + blessingFloat - ganeshaExit * 0.4;
-      this.ganeshaModel.position.z = this.ganeshaBasePosition.z;
+      this.templeModel.rotation.x = 0.012 - progress * 0.035;
+      this.templeModel.rotation.y = -0.34 + progress * 0.72 + ceremonialTurn + Math.sin(elapsed * 0.24) * 0.018;
+      this.templeModel.rotation.z = Math.sin(progress * Math.PI) * -0.015;
+      this.templeModel.position.x = this.modelBasePosition.x + Math.sin(progress * Math.PI * 1.2) * 0.12;
+      this.templeModel.position.y = this.modelBasePosition.y + breathe + reveal * 0.08;
+      this.templeModel.position.z = this.modelBasePosition.z + (1 - reveal) * 0.4 - progress * 0.52;
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -353,13 +416,13 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       materials.forEach((material) => {
         const standard = material as Three.MeshStandardMaterial;
-        standard.side      = THREE.DoubleSide;
-        standard.roughness = 0.68;
-        standard.metalness = 0.02;
+        standard.side = THREE.DoubleSide;
+        standard.roughness = 0.64;
+        standard.metalness = 0.025;
 
         if (standard.map) {
-          standard.map.colorSpace  = THREE.SRGBColorSpace;
-          standard.map.anisotropy  = 8;
+          standard.map.colorSpace = THREE.SRGBColorSpace;
+          standard.map.anisotropy = 8;
           standard.map.needsUpdate = true;
         }
 
@@ -368,8 +431,9 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     });
   }
 
-  private clamp(value: number, min: number, max: number) {
-    return Math.min(max, Math.max(min, value));
+  private setHostProgress(name: string, value: number) {
+    const element = this.templeCanvas?.nativeElement.closest('app-surya-gopuram') as HTMLElement | null;
+    element?.style.setProperty(name, String(value));
   }
 
   private easeInOutCubic(value: number) {
@@ -377,6 +441,6 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
   }
 
   private phase(value: number, start: number, end: number) {
-    return this.easeInOutCubic(this.clamp((value - start) / Math.max(0.001, end - start), 0, 1));
+    return Math.min(1, Math.max(0, (value - start) / Math.max(0.001, end - start)));
   }
 }
