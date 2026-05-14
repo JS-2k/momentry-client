@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import type Lenis from 'lenis';
 import type * as Three from 'three';
 import type { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -18,7 +27,11 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
 
   readonly invitation = SURYA_GOPURAM_INVITATION;
   isMusicPlaying = false;
+  isSceneReady = false;
+  modelLoadProgress = 0;
+  modelLoadFailed = false;
 
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private THREE?: typeof Three;
   private renderer?: Three.WebGLRenderer;
   private scene?: Three.Scene;
@@ -37,9 +50,7 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
   private animationContext?: gsap.Context;
 
   ngAfterViewInit() {
-    void this.createTempleScene();
-    void this.createScrollExperience();
-    void this.startMusic();
+    void this.prepareInvitation();
   }
 
   ngOnDestroy() {
@@ -87,6 +98,19 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     }
 
     await this.startMusic();
+  }
+
+  private async prepareInvitation() {
+    await this.createTempleScene();
+    this.isSceneReady = true;
+    this.changeDetector.detectChanges();
+
+    requestAnimationFrame(() => {
+      void this.createScrollExperience();
+      this.scrollTrigger?.refresh();
+    });
+
+    void this.startMusic();
   }
 
   private async createScrollExperience() {
@@ -318,18 +342,38 @@ export class SuryaGopuram implements AfterViewInit, OnDestroy {
     this.scene.add(ambientLight, sunriseLight, frontLight, lampGlow);
 
     const Loader = loaderModule.GLTFLoader as typeof GLTFLoader;
-    new Loader().load(
-      '/assets/textures/indianTemple/indian_temple_3d_model_south_indian_architecture.glb',
-      (gltf) => {
-        this.templeModel = gltf.scene;
-        this.prepareTempleMaterials(this.templeModel);
-        this.scene?.add(this.templeModel);
-        this.frameTemple();
-      },
-    );
-
     this.resizeRenderer();
     this.animate();
+
+    await new Promise<void>((resolve) => {
+      new Loader().load(
+        '/assets/textures/indianTemple/indian_temple_3d_model_south_indian_architecture.glb',
+        (gltf) => {
+          this.templeModel = gltf.scene;
+          this.prepareTempleMaterials(this.templeModel);
+          this.scene?.add(this.templeModel);
+          this.frameTemple();
+          this.modelLoadProgress = 100;
+          this.changeDetector.detectChanges();
+          requestAnimationFrame(() => resolve());
+        },
+        (event) => {
+          if (!event.lengthComputable || event.total === 0) {
+            this.modelLoadProgress = Math.max(this.modelLoadProgress, 42);
+          } else {
+            this.modelLoadProgress = Math.min(96, Math.round((event.loaded / event.total) * 100));
+          }
+
+          this.changeDetector.detectChanges();
+        },
+        () => {
+          this.modelLoadFailed = true;
+          this.modelLoadProgress = 100;
+          this.changeDetector.detectChanges();
+          resolve();
+        },
+      );
+    });
   }
 
   private resizeRenderer() {

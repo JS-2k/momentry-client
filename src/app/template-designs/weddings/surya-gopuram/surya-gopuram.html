@@ -1,5 +1,24 @@
-<article class="surya-page" aria-label="Surya Gopuram wedding invitation">
+<article
+  class="surya-page"
+  [class.is-scene-ready]="isSceneReady"
+  aria-label="Surya Gopuram wedding invitation"
+>
   <audio #musicPlayer src="/assets/music/kanchi.mp3" loop preload="metadata"></audio>
+
+  <div class="temple-loader" [class.is-hidden]="isSceneReady" role="status" aria-live="polite">
+    <div class="loader-sun" aria-hidden="true"></div>
+    <div class="loader-gopuram" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <p class="eyebrow">Preparing the invitation</p>
+    <h2>{{ modelLoadFailed ? 'Opening the ceremony' : 'Loading the sacred gopuram' }}</h2>
+    <div class="loader-track" aria-hidden="true">
+      <span [style.width.%]="modelLoadProgress"></span>
+    </div>
+    <small>{{ modelLoadFailed ? 'Continuing without preview delay' : modelLoadProgress + '%' }}</small>
+  </div>
 
   <button
     type="button"
