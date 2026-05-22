@@ -1,0 +1,97 @@
+<article
+  class="proposal-page"
+  [class.is-scene-ready]="isSceneReady"
+  [class.answer-yes]="answerState === 'yes'"
+  [class.answer-no]="answerState === 'no'"
+  aria-label="Pink tree proposal invitation"
+>
+  <div class="proposal-loader" [class.is-hidden]="isSceneReady" role="status" aria-live="polite">
+    <div class="loader-ring" aria-hidden="true"></div>
+    <p class="eyebrow">Preparing the proposal</p>
+    <h2>{{ modelLoadFailed ? 'Opening the garden' : 'Growing the pink tree' }}</h2>
+    <div class="loader-track" aria-hidden="true">
+      <span [style.width.%]="modelLoadProgress"></span>
+    </div>
+    <p class="loader-note">{{ assetLoadLabel }}</p>
+    <small>{{ modelLoadFailed ? 'Continuing cinematically' : modelLoadProgress + '%' }}</small>
+  </div>
+
+  <section #storyStage class="proposal-story" aria-labelledby="proposal-title">
+    <div #cinematicPin class="proposal-pin">
+      <div class="night-sky" aria-hidden="true">
+        <div class="moon"></div>
+        <div class="aurora aurora-one"></div>
+        <div class="aurora aurora-two"></div>
+        <div class="lake-glow"></div>
+      </div>
+
+      <div class="stars" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="tree-stage" aria-hidden="true">
+        <div class="tree-aura"></div>
+        <canvas #treeCanvas class="tree-canvas"></canvas>
+        <div class="tree-shadow"></div>
+      </div>
+
+      <div class="proposal-title">
+        <p class="eyebrow">A private invitation</p>
+        <h1 id="proposal-title">{{ proposal.partner }}</h1>
+        <p>{{ proposal.headline }}</p>
+      </div>
+
+      <div class="story-card story-one">
+        <span>First Spark</span>
+        <p>{{ proposal.chapters[0] }}</p>
+      </div>
+
+      <div class="story-card story-two">
+        <span>Everyday Magic</span>
+        <p>{{ proposal.chapters[1] }}</p>
+      </div>
+
+      <div class="story-card story-three">
+        <span>The Question</span>
+        <p>{{ proposal.chapters[2] }}</p>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true"><span></span></div>
+    </div>
+  </section>
+
+  <section class="approval-scene" aria-label="Proposal approval">
+    <div class="petal-finale" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="approval-ring-stage" aria-hidden="true">
+      <canvas #ringCanvas class="ring-canvas"></canvas>
+    </div>
+
+    <div class="approval-copy reveal-soft">
+      <p class="eyebrow">Final Approval</p>
+      <h2>{{ proposal.title }}</h2>
+      <p>{{ proposal.proposer }} is waiting beneath the pink tree.</p>
+    </div>
+
+    <div class="approval-actions reveal-soft">
+      <button type="button" class="yes-button" (click)="answer('yes')">Yes</button>
+      <button type="button" class="no-button" (click)="answer('no')">No</button>
+    </div>
+
+    @if (answerState === 'yes') {
+      <div class="answer-banner" role="status">
+        <span>She said yes</span>
+        <strong>The garden lights up for forever.</strong>
+      </div>
+    } @else if (answerState === 'no') {
+      <div class="answer-banner is-soft" role="status">
+        <span>A tender pause</span>
+        <strong>The story keeps its dignity and fades softly.</strong>
+      </div>
+    }
+  </section>
+</article>

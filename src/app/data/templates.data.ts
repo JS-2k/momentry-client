@@ -15,6 +15,18 @@ export interface InvitationTemplate {
 
 export const INVITATION_TEMPLATES: InvitationTemplate[] = [
   {
+    slug: 'pink-tree-proposal',
+    categorySlug: 'weddings',
+    title: 'Pink Tree Proposal',
+    category: 'Proposal',
+    tags: ['Proposal', '3D', 'Cinematic', 'Romantic'],
+    designer: 'Momentry Studio',
+    photoCount: 1,
+    price: 'Premium',
+    route: '/templates/weddings/pink-tree-proposal',
+    palette: ['#13091d', '#ff79ba', '#ffddec', '#fff8d9'],
+  },
+  {
     slug: 'moonlit-jasmine',
     categorySlug: 'weddings',
     title: 'Moonlit Jasmine',

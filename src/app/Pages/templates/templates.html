@@ -44,17 +44,32 @@
               <span></span>
               <span></span>
             </div>
+          } @else if (template.slug === 'pink-tree-proposal') {
+            <div class="gallery-moon"></div>
+            <div class="gallery-pink-tree">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           }
           <div class="envelope-back"></div>
           <div class="invitation-sheet">
             <img [src]="template.slug === 'moonlit-jasmine' ? '/assets/wedding.jpg' : '/assets/indian-wedding.jpg'" alt="" />
             <div class="sheet-copy">
               <span>{{ template.category }}</span>
-              <strong>{{ template.slug === 'moonlit-jasmine' ? 'Ava & Leo' : 'Meera & Arjun' }}</strong>
-              <small>{{ template.slug === 'moonlit-jasmine' ? '12 Jun 2026' : '24 Aug 2026' }}</small>
+              <strong>
+                {{
+                  template.slug === 'pink-tree-proposal'
+                    ? 'Maya?'
+                    : template.slug === 'moonlit-jasmine'
+                      ? 'Ava & Leo'
+                      : 'Meera & Arjun'
+                }}
+              </strong>
+              <small>{{ template.slug === 'pink-tree-proposal' ? 'Say yes' : template.slug === 'moonlit-jasmine' ? '12 Jun 2026' : '24 Aug 2026' }}</small>
             </div>
           </div>
-          <div class="wax-seal">{{ template.slug === 'kanchi-thoranam' ? 'ஸ்ரீ' : 'M' }}</div>
+          <div class="wax-seal">{{ template.slug === 'kanchi-thoranam' ? 'ஸ்ரீ' : template.slug === 'pink-tree-proposal' ? 'Y' : 'M' }}</div>
         </div>
 
         <div class="card-details">

@@ -13,7 +13,7 @@ export class Templates {
   searchTerm = '';
   selectedCategory = 'Wedding';
 
-  readonly categories = ['Wedding', 'Elegant', 'Floral', 'Minimal', 'Luxury'];
+  readonly categories = ['Wedding', 'Proposal', '3D', 'Cinematic', 'Elegant', 'Floral', 'Luxury'];
 
   readonly templates = INVITATION_TEMPLATES;
 
