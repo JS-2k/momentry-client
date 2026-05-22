@@ -11,9 +11,9 @@ import { INVITATION_TEMPLATES } from '../../data/templates.data';
 })
 export class Templates {
   searchTerm = '';
-  selectedCategory = 'Wedding';
+  selectedCategory = 'All';
 
-  readonly categories = ['Wedding', 'Proposal', '3D', 'Cinematic', 'Elegant', 'Floral', 'Luxury'];
+  readonly categories = ['All', 'Wedding', 'Proposal', '3D', 'Cinematic', 'Elegant', 'Floral', 'Luxury'];
 
   readonly templates = INVITATION_TEMPLATES;
 
@@ -22,6 +22,7 @@ export class Templates {
 
     return this.templates.filter((template) => {
       const categoryMatch =
+        this.selectedCategory === 'All' ||
         this.selectedCategory === template.category || template.tags.includes(this.selectedCategory);
 
       const searchMatch =
